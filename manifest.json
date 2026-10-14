@@ -1,0 +1,10 @@
+{
+    "display_name": "SillyTavern-Fullscreen",
+    "loading_order": 1,
+    "requires": [],
+    "optional": [],
+    "js": "index.js",
+    "author": "Nakari (Trimmed)",
+    "version": "1.0.0",
+    "homePage": ""
+}
