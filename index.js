@@ -3,7 +3,7 @@ import { saveSettingsDebounced } from "../../../../script.js";
 
 const extensionName = "SillyTavern-Fullscreen";
 
-// 默认设置对象
+// 默认设置
 const defaultSettings = {
     fullscreen: false,
     bottomBarPosition: 0, 
@@ -22,111 +22,7 @@ for (const [key, value] of Object.entries(defaultSettings)) {
 
 const settings = extension_settings[extensionName];
 
-// ================== CSS 样式 (内嵌于脚本中) ==================
-const customCSS = `
-/* ================== 插件面板基础样式 ================== */
-.te-sub-options {
-  margin: 5px 0 10px 10px;
-  border-left: 1px solid var(--SmartThemeBodyColor);
-  padding-left: 10px;
-  display: none;
-}
-#te-settings-drawer #te_fs_options > div > label,
-#te-settings-drawer #te_fs_options > label {
-  margin: 0 !important;
-  padding: 5px 0 5px 5px !important;
-}
-#te-settings-drawer > div.inline-drawer-content > label,
-#te-settings-drawer > div.inline-drawer-content > div.flex-container.flexFlowColumn > label {
-  align-items: center !important;
-  padding-top: 5px !important;
-  padding-bottom: 5px !important;
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
-}
-.te-setting-title { padding-left: 10px; }
-
-/* ================== 启用全屏模式的核心逻辑 ================== */
-body.te-fullscreen {
-  #form_sheld {
-    margin: 0 auto !important;
-    position: absolute !important;
-    bottom: calc(var(--te-bottom-bar-pos, 0) * 1px) !important;
-    left: 0 !important;
-    transform: none !important;
-    &:has(#send_textarea:focus, #send_textarea:not(:placeholder-shown)) {
-      position: sticky !important;
-      background-color: var(--SmartThemeChatTintColor);
-    }
-  }
-
-  &:not(.waifuMode) #sheld {
-    top: 0 !important;
-    height: 100dvh !important;
-    min-height: 100dvh !important;
-  }
-
-  #chat {
-    height: 100dvh !important;
-    min-height: 100dvh !important;
-    padding-top: calc(var(--topBarBlockSize) * 2) !important;
-  }
-
-  &:not(.te-only-hide-top-bar) {
-    #send_form, #form_sheld {
-      opacity: 0;
-      transition: all 0.5s ease;
-      &:focus-within,
-      &:hover,
-      &:has(#send_textarea:not(:placeholder-shown)) {
-        opacity: 1;
-      }
-    }
-  }
-
-  #form_sheld:has(#dialogue_del_mes[style*="display: block"]) {
-    opacity: 1;
-    #send_form { display: none !important; }
-  }
-
-  #top-bar,
-  #top-settings-holder,
-  .drawer-toggle {
-    opacity: 0;
-    transition: all 0.5s ease;
-  }
-
-  /* 核心呼出机制：抽屉打开或鼠标悬停时才显示 */
-  &:has(.drawer-content.openDrawer, .drawer:hover) {
-    #top-bar,
-    #top-settings-holder,
-    .drawer-toggle {
-      opacity: 1;
-    }
-  }
-
-  #extensionConnectionProfiles {
-    position: absolute !important;
-    top: calc(var(--topBarBlockSize) * 2) !important;
-    z-index: 100;
-  }
-
-  #extensionTopBar {
-    position: absolute !important;
-    top: var(--topBarBlockSize) !important;
-    z-index: 100;
-    opacity: 0;
-    transition: all 0.5s ease;
-    &:focus-within,
-    &:hover,
-    &:has(#extensionTopBarSearchInput:not(:placeholder-shown), #extensionTopBarToggleConnectionProfiles.active, #extensionTopBarToggleSidebar.active) {
-      opacity: 1;
-    }
-  }
-}
-`;
-
-// ================== 插件的 UI HTML ==================
+// 插件的 UI HTML
 const uiHTML = `
 <div class="inline-drawer wide100p flexFlowColumn" id="te-settings-drawer">
     <div class="inline-drawer-toggle inline-drawer-header userSettingsInnerExpandable">
@@ -154,7 +50,7 @@ const uiHTML = `
 </div>
 `;
 
-// 刷新 CSS class 和变量
+// 刷新 CSS 类名与变量
 function updateBodyClasses() {
     $('body').toggleClass('te-fullscreen', Boolean(settings.fullscreen));
     $('body').toggleClass('te-only-hide-top-bar', Boolean(settings.fullscreen && settings.onlyHideTopBar));
@@ -163,24 +59,30 @@ function updateBodyClasses() {
 
 // 初始化插件
 jQuery(async () => {
-    // 动态将内置的 CSS 注入到网页的 head 标签中
-    $('head').append(\`<style id="te-fullscreen-style">\${customCSS}</style>\`);
+    // 【关键修改】：寻找扩展页面容器 (#extensions_settings)，直接把入口挂在扩展列表里！
+    const $container = $('#extensions_settings, #extensions_settings2').first();
+    if ($container.length) {
+        $container.append(uiHTML);
+    } else {
+        $('#rm_extensions_block').append(uiHTML);
+    }
 
-    // 注入 UI 设置面板
-    const $target = $('div[name="themeElements"] > .inline-drawer.wide100p.flexFlowColumn').first();
-    $target.before(uiHTML);
-
-    // 回显保存的设置数据
+    // 回显保存的开关状态
     $('#te_fullscreen').prop('checked', settings.fullscreen);
     $('#te_bottom_bar_pos').val(settings.bottomBarPosition);
     $('#te_only_hide_top_bar').prop('checked', settings.onlyHideTopBar);
 
     if (settings.fullscreen) $('#te_fs_options').show();
 
-    // 初始化 CSS 类名
+    // 绑定折叠面板的展开/收起点击事件
+    $('#te-settings-drawer .inline-drawer-toggle').on('click', function() {
+        $('#te-settings-drawer .inline-drawer-content').slideToggle(200);
+        $(this).find('.inline-drawer-icon').toggleClass('down up');
+    });
+
     updateBodyClasses();
 
-    // ---------------- 事件绑定 ----------------
+    // 绑定开关变动事件
     $('#te_fullscreen').on('change', function() {
         settings.fullscreen = $(this).is(':checked');
         settings.fullscreen ? $('#te_fs_options').slideDown(200) : $('#te_fs_options').slideUp(200);
