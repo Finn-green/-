@@ -22,29 +22,27 @@ for (const [key, value] of Object.entries(defaultSettings)) {
 
 const settings = extension_settings[extensionName];
 
-// 插件的 UI HTML
+// 插件的 UI HTML（扁平直观，不再套娃隐藏）
 const uiHTML = `
-<div class="inline-drawer wide100p flexFlowColumn" id="te-settings-drawer">
-    <div class="inline-drawer-toggle inline-drawer-header userSettingsInnerExpandable">
-        <b><span>全屏设置</span></b>
-        <div class="fa-solid fa-circle-chevron-down inline-drawer-icon down"></div>
+<div class="inline-drawer" id="te-settings-drawer">
+    <div class="inline-drawer-toggle inline-drawer-header">
+        <b>全屏设置</b>
+        <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
     </div>
     <div class="inline-drawer-content" style="display: none;">
-        
         <label class="checkbox_label">
             <input type="checkbox" id="te_fullscreen" />
             <span>启用全屏模式</span>
         </label>
         
-        <div id="te_fs_options" class="te-sub-options">
-            <div class="flex-container alignitemscenter margin-b-5">
-                <span class="te-setting-title">底栏上下位置：</span>
-                <input type="number" id="te_bottom_bar_pos" class="text_pole" style="width: 100px; text-align: center;" value="0">
-            </div>
-            <label class="checkbox_label">
-                <input type="checkbox" id="te_only_hide_top_bar" />
-                <span>仅隐藏顶栏</span>
-            </label>
+        <label class="checkbox_label" style="margin-top: 8px;">
+            <input type="checkbox" id="te_only_hide_top_bar" />
+            <span>仅隐藏顶栏 (不隐藏底栏)</span>
+        </label>
+
+        <div class="flex-container alignitemscenter" style="margin-top: 8px; gap: 8px;">
+            <span>底栏上下位置：</span>
+            <input type="number" id="te_bottom_bar_pos" class="text_pole" style="width: 80px; text-align: center;" value="0">
         </div>
     </div>
 </div>
@@ -59,7 +57,7 @@ function updateBodyClasses() {
 
 // 初始化插件
 jQuery(async () => {
-    // 【关键修改】：寻找扩展页面容器 (#extensions_settings)，直接把入口挂在扩展列表里！
+    // 注入到扩展列表（SillyTavern 标准扩展面板）
     const $container = $('#extensions_settings, #extensions_settings2').first();
     if ($container.length) {
         $container.append(uiHTML);
@@ -67,37 +65,28 @@ jQuery(async () => {
         $('#rm_extensions_block').append(uiHTML);
     }
 
-    // 回显保存的开关状态
-    $('#te_fullscreen').prop('checked', settings.fullscreen);
+    // 回显保存的状态
+    $('#te_fullscreen').prop('checked', Boolean(settings.fullscreen));
+    $('#te_only_hide_top_bar').prop('checked', Boolean(settings.onlyHideTopBar));
     $('#te_bottom_bar_pos').val(settings.bottomBarPosition);
-    $('#te_only_hide_top_bar').prop('checked', settings.onlyHideTopBar);
-
-    if (settings.fullscreen) $('#te_fs_options').show();
-
-    // 绑定折叠面板的展开/收起点击事件
-    $('#te-settings-drawer .inline-drawer-toggle').on('click', function() {
-        $('#te-settings-drawer .inline-drawer-content').slideToggle(200);
-        $(this).find('.inline-drawer-icon').toggleClass('down up');
-    });
 
     updateBodyClasses();
 
-    // 绑定开关变动事件
+    // 绑定设置修改事件
     $('#te_fullscreen').on('change', function() {
         settings.fullscreen = $(this).is(':checked');
-        settings.fullscreen ? $('#te_fs_options').slideDown(200) : $('#te_fs_options').slideUp(200);
-        updateBodyClasses();
-        saveSettingsDebounced();
-    });
-
-    $('#te_bottom_bar_pos').on('input', function() {
-        settings.bottomBarPosition = $(this).val() || 0;
         updateBodyClasses();
         saveSettingsDebounced();
     });
 
     $('#te_only_hide_top_bar').on('change', function() {
         settings.onlyHideTopBar = $(this).is(':checked');
+        updateBodyClasses();
+        saveSettingsDebounced();
+    });
+
+    $('#te_bottom_bar_pos').on('input', function() {
+        settings.bottomBarPosition = $(this).val() || 0;
         updateBodyClasses();
         saveSettingsDebounced();
     });
