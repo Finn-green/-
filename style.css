@@ -1,0 +1,113 @@
+/* ================== 插件面板基础样式 ================== */
+.te-sub-options {
+  margin: 5px 0 10px 10px;
+  border-left: 1px solid var(--SmartThemeBodyColor);
+  padding-left: 10px;
+  display: none;
+}
+
+#te-settings-drawer #te_fs_options > div > label,
+#te-settings-drawer #te_fs_options > label {
+  margin: 0 !important;
+  padding: 5px 0 5px 5px !important;
+}
+
+#te-settings-drawer > div.inline-drawer-content > label,
+#te-settings-drawer > div.inline-drawer-content > div.flex-container.flexFlowColumn > label {
+  align-items: center !important;
+  padding-top: 5px !important;
+  padding-bottom: 5px !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.te-setting-title {
+  padding-left: 10px;
+}
+
+/* ================== 启用全屏模式 ================== */
+body.te-fullscreen {
+  #form_sheld {
+    margin: 0 auto !important;
+    position: absolute !important;
+    bottom: calc(var(--te-bottom-bar-pos, 0) * 1px) !important;
+    left: 0 !important;
+    transform: none !important;
+
+    /* by @lambkinling */
+    &:has(#send_textarea:focus, #send_textarea:not(:placeholder-shown)) {
+      position: sticky !important;
+      background-color: var(--SmartThemeChatTintColor);
+    }
+  }
+
+  &:not(.waifuMode) #sheld {
+    top: 0 !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+  }
+
+  #chat {
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    padding-top: calc(var(--topBarBlockSize) * 2) !important;
+  }
+
+  &:not(.te-only-hide-top-bar) {
+    /* by @lazyalie & @lambkinling */
+    #send_form, #form_sheld {
+      opacity: 0;
+      transition: all 0.5s ease;
+
+      &:focus-within,
+      &:hover,
+      &:has(#send_textarea:not(:placeholder-shown)) {
+        opacity: 1;
+      }
+    }
+  }
+
+  #form_sheld:has(#dialogue_del_mes[style*="display: block"]) {
+    opacity: 1;
+
+    #send_form {
+      display: none !important;
+    }
+  }
+
+  #top-bar,
+  #top-settings-holder,
+  .drawer-toggle {
+    opacity: 0;
+    transition: all 0.5s ease;
+  }
+
+  &:has(.drawer-content.openDrawer, .drawer:hover) {
+    #top-bar,
+    #top-settings-holder,
+    .drawer-toggle {
+      opacity: 1;
+    }
+  }
+
+  /* Chat Top Bar */
+  #extensionConnectionProfiles {
+    position: absolute !important;
+    top: calc(var(--topBarBlockSize) * 2) !important;
+    z-index: 100;
+  }
+
+  #extensionTopBar {
+    position: absolute !important;
+    top: var(--topBarBlockSize) !important;
+    z-index: 100;
+    opacity: 0;
+    transition: all 0.5s ease;
+
+    &:focus-within,
+    &:hover,
+    &:has(#extensionTopBarSearchInput:not(:placeholder-shown), #extensionTopBarToggleConnectionProfiles.active, #extensionTopBarToggleSidebar.active) {
+      opacity: 1;
+    }
+  }
+}
