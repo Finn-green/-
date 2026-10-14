@@ -1,9 +1,10 @@
 {
-    "display_name": "SillyTavern-Fullscreen",
+    "display_name": "隐藏顶栏",
     "loading_order": 1,
     "requires": [],
     "optional": [],
     "js": "index.js",
+    "css": "style.css",
     "author": "Nakari (Trimmed)",
     "version": "1.0.0",
     "homePage": ""
