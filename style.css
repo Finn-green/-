@@ -1,28 +1,7 @@
 /* ================== 插件面板基础样式 ================== */
-.te-sub-options {
-  margin: 5px 0 10px 10px;
-  border-left: 1px solid var(--SmartThemeBodyColor);
-  padding-left: 10px;
-  display: none;
-}
-
-#te-settings-drawer #te_fs_options > div > label,
-#te-settings-drawer #te_fs_options > label {
-  margin: 0 !important;
-  padding: 5px 0 5px 5px !important;
-}
-
-#te-settings-drawer > div.inline-drawer-content > label,
-#te-settings-drawer > div.inline-drawer-content > div.flex-container.flexFlowColumn > label {
+#te-settings-drawer .inline-drawer-content label {
   align-items: center !important;
-  padding-top: 5px !important;
-  padding-bottom: 5px !important;
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
-}
-
-.te-setting-title {
-  padding-left: 10px;
+  margin: 5px 0 !important;
 }
 
 /* ================== 启用全屏模式 ================== */
