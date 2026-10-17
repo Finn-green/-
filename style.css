@@ -33,7 +33,6 @@ body.te-fullscreen {
   }
 
   &:not(.te-only-hide-top-bar) {
-    /* by @lazyalie & @lambkinling */
     #send_form, #form_sheld {
       opacity: 0;
       transition: all 0.5s ease;
@@ -89,4 +88,14 @@ body.te-fullscreen {
       opacity: 1;
     }
   }
+}
+
+/* ================== 防遮挡：调整正文底部边距 ================== */
+body.te-prevent-arrow-overlap #chat {
+  padding-bottom: calc(var(--te-bottom-bar-padding, 60) * 1px) !important;
+}
+
+body.te-prevent-arrow-overlap #chat .mes:last-of-type,
+body.te-prevent-arrow-overlap #chat .last_mes {
+  margin-bottom: 0 !important;
 }
